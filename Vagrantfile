@@ -32,7 +32,6 @@ Vagrant.configure("2") do |config|
 			d.create_args = [
 			    "-it",
 			    "--add-host=host.pterodactyl.test:172.17.0.1",
-				"--add-host=daemon.pterodactyl.test:192.168.50.4",
 				"--add-host=daemon.pterodactyl.test:192.168.50.3",
 			]
 			d.ports = ["80:80", "443:443", "8080:8080", "8081:8081"]
@@ -107,8 +106,7 @@ Vagrant.configure("2") do |config|
 				"--innodb_flush_log_at_trx_commit=0",
 				"--lower_case_table_names=1"
 			]
-			d.volumes = ["#{vagrant_root}/.data/mysql:/var/lib/mysql:cached"]
-			d.env = {
+			d.env = {	
 				"MYSQL_ROOT_PASSWORD": "root",
 				"MYSQL_DATABASE": "panel",
 				"MYSQL_USER": "pterodactyl",
