@@ -8,11 +8,8 @@ vagrant plugin install vagrant-hostmanager
 
 cd ${CURRENT_DIRECTORY}
 
-git clone https://github.com/pterodactyl/panel.git code/panel
-git clone https://github.com/pterodactyl/documentation.git code/documentation
-git clone https://github.com/pterodactyl/wings.git code/wings
-git clone https://github.com/pterodactyl/daemon.git code/daemon
-git clone https://github.com/pterodactyl/sftp-server.git code/sftp-server
+git clone https://github.com/unnamedpanel/panel.git code/panel
+git clone https://github.com/unnamedpanel/daemon.git code/daemon
 
 mkdir -p .data/certificates
 

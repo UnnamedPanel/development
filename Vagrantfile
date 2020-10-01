@@ -63,8 +63,8 @@ Vagrant.configure("2") do |config|
 			cp .env .env.bkup
 			php artisan key:generate --force --no-interaction
 
-			php artisan p:environment:setup --new-salt --author="you@example.com" --url="http://pterodactyl.test" --timezone="America/Los_Angeles" --cache=redis --session=redis --queue=redis --redis-host="host.pterodactyl.test" --no-interaction
-			php artisan p:environment:database --host="host.pterodactyl.test" --database=panel --username=pterodactyl --password=pterodactyl --no-interaction
+			php artisan p:environment:setup --new-salt --author="you@example.com" --url="http://pterodactyl.test" --timezone="America/Los_Angeles" --cache=redis --session=redis --queue=redis --redis-host="redis.pterodactyl.test" --no-interaction
+			php artisan p:environment:database --host="mysql.pterodactyl.test" --database=panel --username=pterodactyl --password=pterodactyl --no-interaction
 			php artisan p:environment:mail --driver=smtp --email="outgoing@example.com" --from="Pterodactyl Panel" --host="host.pterodactyl.test" --port=1025 --no-interaction
 
 			php artisan migrate --seed
@@ -90,46 +90,6 @@ Vagrant.configure("2") do |config|
 
 		wings.vm.provision "provision", type: "shell", path: "#{vagrant_root}/scripts/provision_wings.sh"
 	end
-
-	config.vm.define "daemon", autostart: false do |daemon|
-		daemon.vm.hostname = "daemon.pterodactyl.test"
-		daemon.vm.box = "bento/ubuntu-18.04"
-
-		daemon.vm.synced_folder ".", "/vagrant", disabled: true
-		daemon.vm.synced_folder "#{vagrant_root}/code/daemon", "/srv/daemon", owner: "vagrant", group: "vagrant"
-		daemon.vm.synced_folder "#{vagrant_root}/.data/certificates", "/etc/ssl/private", owner: "vagrant", group: "vagrant"
-		daemon.vm.synced_folder "#{vagrant_root}/code/sftp-server", "/home/vagrant/sftp-server", owner: "vagrant", group: "vagrant"
-
-		daemon.vm.network :private_network, ip: "192.168.50.4"
-
-		daemon.vm.provision "provision", type: "shell", path: "#{vagrant_root}/scripts/provision_daemon.sh"
-	end
-
-	config.vm.define "docs" do |docs|
-		docs.vm.hostname = "docs.pterodactyl.test"
-		docs.vm.synced_folder ".", "/vagrant", disabled: true
-
-		docs.vm.network "forwarded_port", guest: 80, host: 9090
-		docs.vm.network "forwarded_port", guest: 9091, host: 9091
-
-		docs.ssh.insert_key = true
-		docs.ssh.username = "root"
-		docs.ssh.password = "vagrant"
-
-		docs.vm.provider "docker" do |d|
-			d.image = "quay.io/pterodactyl/vagrant-core"
-			d.create_args = ["-it", "--add-host=host.pterodactyl.test:172.17.0.1"]
-			d.ports = ["9090:80", "9091:9091"]
-			d.volumes = ["#{vagrant_root}/code/documentation:/srv/documentation:cached"]
-			d.remains_running = true
-			d.has_ssh = true
-			d.privileged = true
-		end
-
-		docs.vm.provision "deploy_files", type: "file", source: "#{vagrant_root}/build/configs", destination: "/tmp/.deploy"
-		docs.vm.provision "setup_documentation", type: "shell", path: "#{vagrant_root}/scripts/deploy_docs.sh"
-	end
-
 
 	# Configure a mysql docker container.
 	config.vm.define "mysql" do |mysql|
