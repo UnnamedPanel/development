@@ -33,7 +33,7 @@ Vagrant.configure("2") do |config|
 			    "-it",
 			    "--add-host=host.pterodactyl.test:172.17.0.1",
 				"--add-host=daemon.pterodactyl.test:192.168.50.4",
-				"--add-host=wings.pterodactyl.test:192.168.50.3",
+				"--add-host=daemon.pterodactyl.test:192.168.50.3",
 			]
 			d.ports = ["80:80", "443:443", "8080:8080", "8081:8081"]
 
@@ -71,24 +71,23 @@ Vagrant.configure("2") do |config|
 		SHELL
 	end
 
-	config.vm.define "wings", autostart: false do |wings|
-		wings.vm.hostname = "wings.pterodactyl.test"
-		wings.vm.box = "bento/ubuntu-18.04"
+	config.vm.define "daemon", autostart: false do |daemon|
+		daemon.vm.hostname = "daemon.pterodactyl.test"
+		daemon.vm.box = "bento/ubuntu-18.04"
 
-        wings.vm.provider "virtualbox" do |v|
+        daemon.vm.provider "virtualbox" do |v|
             v.memory = 2048
             v.cpus = 2
             v.customize ["modifyvm", :id, "--cpuexecutioncap", "75"]
         end
 
-		wings.vm.synced_folder ".", "/vagrant", disabled: true
-        wings.vm.synced_folder "#{vagrant_root}/code/wings", "/home/vagrant/wings", owner: "vagrant", group: "vagrant"
-        wings.vm.synced_folder "#{vagrant_root}/code/sftp-server", "/home/vagrant/sftp-server", owner: "vagrant", group: "vagrant"
-        wings.vm.synced_folder "#{vagrant_root}/.data/certificates", "/etc/ssl/private", owner: "vagrant", group: "vagrant"
+		daemon.vm.synced_folder ".", "/vagrant", disabled: true
+        daemon.vm.synced_folder "#{vagrant_root}/code/daemon", "/home/vagrant/daemon", owner: "vagrant", group: "vagrant"
+        daemon.vm.synced_folder "#{vagrant_root}/.data/certificates", "/etc/ssl/private", owner: "vagrant", group: "vagrant"
 
-		wings.vm.network :private_network, ip: "192.168.50.3"
+		daemon.vm.network :private_network, ip: "192.168.50.3"
 
-		wings.vm.provision "provision", type: "shell", path: "#{vagrant_root}/scripts/provision_wings.sh"
+		daemon.vm.provision "provision", type: "shell", path: "#{vagrant_root}/scripts/provision_daemon.sh"
 	end
 
 	# Configure a mysql docker container.
