@@ -56,6 +56,9 @@ EOF
 # Install development dependencies
 yarn install --no-progress
 
+# Build the site
+yarn build:production
+
 # Cleanup
 rm -rfv /var/www
 rm -rv /etc/nginx/sites-enabled/*
